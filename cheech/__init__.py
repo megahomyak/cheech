@@ -1,24 +1,30 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser as _ArgumentParser
 
-class WithDefault:
-    def __init__(self, argname, default_value):
-        self.argname = argname
-        self.default_value = default_value
+_NOT_SPECIFIED = object()
 
-def require(*argnames):
-    argparser = ArgumentParser()
-    plain_argnames = []
-    for argname in argnames:
-        if isinstance(argname, WithDefault):
-            plain_argnames.append(argname.argname)
-            argparser.add_argument("-" + argname.argname, default=argname.default_value)
-        elif isinstance(argname, str):
-            plain_argnames.append(argname)
-            argparser.add_argument("-" + argname, required=True)
+class Arg:
+    def __init__(self, argname, *, default=_NOT_SPECIFIED, converter=lambda x: x):
+        self.name = argname
+        self.default = default
+        self.converter = converter
+
+def require(*args):
+    converted_args = []
+    for arg in args:
+        if isinstance(arg, str):
+            arg = Arg(arg)
+        converted_args.append(arg)
+    args = converted_args
+    argparser = _ArgumentParser()
+    for arg in args:
+        kwargs = {}
+        if arg.default is _NOT_SPECIFIED:
+            kwargs["required"] = True
         else:
-            raise TypeError(f"encountered an argument name of an incompatible type {type(argname)}")
-    args = argparser.parse_args()
+            kwargs["default"] = arg.default
+        argparser.add_argument("--" + arg.name, **kwargs)
+    input_values = argparser.parse_args()
     return [
-        getattr(args, plain_argname)
-        for plain_argname in plain_argnames
+        arg.converter(getattr(input_values, arg.name))
+        for arg in args
     ]
