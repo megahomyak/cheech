@@ -14,7 +14,7 @@ def require(*argnames):
             argparser.add_argument("-" + argname.argname, default=argname.default_value)
         elif isinstance(argname, str):
             plain_argnames.append(argname)
-            argparser.add_argument("-" + argname)
+            argparser.add_argument("-" + argname, required=True)
         else:
             raise TypeError(f"encountered an argument name of an incompatible type {type(argname)}")
     args = argparser.parse_args()
