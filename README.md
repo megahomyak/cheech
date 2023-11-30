@@ -2,6 +2,10 @@
 
 Cheech is a little program to get arguments from the command line
 
+## Installation
+
+`pip install cheech`
+
 ## Usage
 
 ```python
