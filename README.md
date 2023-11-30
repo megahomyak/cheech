@@ -1,6 +1,6 @@
 # Cheech
 
-Cheech is a little program to require arguments from the command line
+Cheech is a little program to get arguments from the command line
 
 ## Usage
 
